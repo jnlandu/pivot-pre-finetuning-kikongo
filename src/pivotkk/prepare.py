@@ -10,6 +10,7 @@ import json
 import random
 import tarfile
 import urllib.request
+import unicodedata
 from pathlib import Path
 
 import pandas as pd
@@ -79,6 +80,63 @@ def sample_ladder(
 # --------------------------------------------------------------------------- #
 # target gold data (Google SMOL)
 # --------------------------------------------------------------------------- #
+def normalize_text(text: str) -> str:
+    return " ".join(unicodedata.normalize("NFKC", text).casefold().split())
+
+
+def split_target_pairs(rows: list[dict], seed: int = 13) -> dict[str, pd.DataFrame]:
+    """Keep documents and duplicate-linked documents in one partition.
+
+    Link before cleaning: even a duplicate later removed must not connect
+    training and held-out documents. Match normalized source and target text.
+    """
+    parents = {r["group_id"]: r["group_id"] for r in rows}
+
+    def root(key):
+        while parents[key] != key:
+            parents[key] = parents[parents[key]]
+            key = parents[key]
+        return key
+
+    seen = {}
+    for r in rows:
+        for side in ("src", "trg"):
+            key = (side, normalize_text(r[side]))
+            if not key[1]:
+                continue
+            if key in seen:
+                parents[root(r["group_id"])] = root(seen[key])
+            seen[key] = r["group_id"]
+    frame = clean_pairs(pd.DataFrame(rows))
+    frame["group_id"] = frame.group_id.map(root)
+    frame = frame.loc[~frame.src.map(normalize_text).duplicated()].copy()
+    groups = list(frame.groupby("group_id", sort=True))
+    rng = random.Random(seed)
+    rng.shuffle(groups)
+    # Preserve approximately the document/standalone mixture in each split.
+    buckets = {}
+    for _, group in groups:
+        kind = "smoldoc" if "smoldoc" in set(group.origin) else "smolsent"
+        buckets.setdefault(kind, []).append(group)
+    parts = {k: [] for k in ("train", "dev", "test")}
+    n_test = min(300, len(frame) // 4)
+    for bucket in buckets.values():
+        total = sum(len(g) for g in bucket)
+        targets = {"test": round(total * n_test / len(frame)),
+                   "dev": round(total * (n_test // 2) / len(frame))}
+        counts = {"test": 0, "dev": 0}
+        for group in bucket:
+            dest = "train"
+            for name in ("test", "dev"):
+                if abs(counts[name] + len(group) - targets[name]) < abs(counts[name] - targets[name]):
+                    dest = name
+                    counts[name] += len(group)
+                    break
+            parts[dest].append(group)
+    return {k: pd.concat(v).sample(frac=1, random_state=seed).reset_index(drop=True)
+            if v else frame.iloc[:0].copy() for k, v in parts.items()}
+
+
 def _fetch_jsonl(url: str, dest: Path) -> list[dict]:
     dest.parent.mkdir(parents=True, exist_ok=True)
     if not dest.exists():
@@ -99,7 +157,9 @@ def build_target_gold(seed: int = 13) -> dict[str, pd.DataFrame]:
     rows: list[dict] = []
 
     sent = _fetch_jsonl(S.SMOL_FILES["smolsent"][0], RAW / "smol" / "smolsent_en_kg.jsonl")
-    rows += [{"src": r["src"], "trg": r["trg"], "origin": "smolsent"} for r in sent]
+    rows += [{"src": r["src"], "trg": r["trg"], "origin": "smolsent",
+              "sentence_id": r.get("id", i), "document_id": None,
+              "group_id": f"sent:{r.get('id', i)}"} for i, r in enumerate(sent)]
 
     doc = _fetch_jsonl(S.SMOL_FILES["smoldoc"][0], RAW / "smol" / "smoldoc_en_kg.jsonl")
     dropped = 0
@@ -108,12 +168,14 @@ def build_target_gold(seed: int = 13) -> dict[str, pd.DataFrame]:
         if len(srcs) != len(trgs):
             dropped += 1
             continue
-        rows += [{"src": s, "trg": t, "origin": "smoldoc"} for s, t in zip(srcs, trgs)]
+        rows += [{"src": s, "trg": t, "origin": "smoldoc", "document_id": r["id"],
+                  "sentence_index": i, "group_id": f"doc:{r['id']}"}
+                 for i, (s, t) in enumerate(zip(srcs, trgs))]
     if dropped:
         print(f"  dropped {dropped} smoldoc docs with mismatched src/trg lengths")
 
-    pairs = clean_pairs(pd.DataFrame(rows))
-    print(f"  {len(pairs)} clean sentence pairs")
+    splits = split_target_pairs(rows, seed)
+    print(f"  {sum(len(v) for v in splits.values())} clean sentence pairs")
 
     lex_raw = _fetch_jsonl(S.SMOL_FILES["gatitos"][0], RAW / "smol" / "gatitos_en_kg.jsonl")
     lex = pd.DataFrame(
@@ -128,14 +190,7 @@ def build_target_gold(seed: int = 13) -> dict[str, pd.DataFrame]:
     # Held-out SMOL test set. This is the second evaluation axis: it is
     # professionally translated and provenance-independent from FLORES-200, so
     # agreement (or not) between the two is itself a result.
-    shuffled = pairs.sample(frac=1.0, random_state=seed).reset_index(drop=True)
-    n_test = min(300, len(shuffled) // 4)
-    splits = {
-        "test": shuffled.iloc[:n_test],
-        "dev": shuffled.iloc[n_test : n_test + n_test // 2],
-        "train": shuffled.iloc[n_test + n_test // 2 :],
-        "lexicon": lex,
-    }
+    splits["lexicon"] = lex
     for name, frame in splits.items():
         _write(frame, PROC / "target" / f"smol_{name}.jsonl")
     return splits

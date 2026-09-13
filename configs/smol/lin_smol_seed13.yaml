@@ -1,0 +1,13 @@
+name: lin_smol_seed13
+base_model: google/mt5-base
+pivot: lin
+pivot_seed: 13
+target_seed: 13
+batch_size: 4
+grad_accum: 8
+bf16: true
+target_epochs: 20.0
+early_stopping_patience: 3
+pivot_data: data/processed/pivot/lin_smol_reviewed.jsonl
+pivot_size: 2916
+pivot_epochs: 1.0

@@ -1,0 +1,10 @@
+name: no_pivot_seed13
+base_model: google/mt5-base
+pivot: null
+pivot_seed: 13
+target_seed: 13
+batch_size: 4
+grad_accum: 8
+bf16: true
+target_epochs: 20.0
+early_stopping_patience: 3

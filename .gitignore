@@ -1,0 +1,21 @@
+data/raw/
+data/interim/
+data/processed/
+# Kunzika 2008 is in copyright; the extracted proverbs stay local.
+data/proverbs/*
+!data/proverbs/README.md
+runs/
+*.pt
+*.bin
+.venv/
+__pycache__/
+*.egg-info/
+.DS_Store
+
+
+#Misc
+CLEAR_Gamayun_lin-fra_5k
+paper
+references/
+DIRECTIONS.md
+RESOURCES.md
