@@ -1,0 +1,24 @@
+{
+  "dataset": "michsethowusu/english-lingala_sentence-pairs",
+  "upstream_rows": 2910515,
+  "cleaned_pool_rows": 2260858,
+  "sampling": "stratified",
+  "rows": 50000,
+  "sha256": "a4a1711703c2defd5365c3cb661ea48aa3f9497f387eacf41190501d2c71dada",
+  "duplicate_exact_sources": 0,
+  "duplicate_normalized_sources": 0,
+  "empty_pairs": 0,
+  "evaluation_source_overlap": {
+    "smol_dev": 0,
+    "smol_test": 0,
+    "flores200_dev": 0,
+    "flores200_devtest": 0
+  },
+  "limitations": [
+    "Overlap check uses Unicode normalization, case folding and whitespace normalization; semantic near-duplicates are not checked.",
+    "Lingala translation quality has not been validated by a speaker."
+  ],
+  "normalized_deduplicated_pool_rows": 2165961,
+  "evaluation_overlapping_pool_rows_removed": 0,
+  "eligible_pool_rows": 2165961
+}

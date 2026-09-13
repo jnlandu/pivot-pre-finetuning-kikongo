@@ -1,0 +1,40 @@
+{
+  "source": "https://huggingface.co/datasets/google/smol",
+  "input_sentences": 863,
+  "input_documents": 343,
+  "input_document_sentence_pairs": 3869,
+  "blocked_kikongo_documents": 24,
+  "excluded_lingala_documents": 24,
+  "mismatched_documents": 0,
+  "output_pairs": 4234,
+  "origins": {
+    "smoldoc": 3528,
+    "smolsent": 706
+  },
+  "previously_reviewed_pairs_retained": 2916,
+  "newly_eligible_pairs_needing_review": 1318,
+  "normalized_source_duplicates": 0,
+  "evaluation_source_overlap": {
+    "smol_dev": 0,
+    "smol_test": 0,
+    "flores200_dev": 0,
+    "flores200_devtest": 0
+  },
+  "blocked_document_source_overlap": 0,
+  "input_sha256": {
+    "smolsent_en_ln.jsonl": "9fcea1c3edbcebf6b4e7c3afc5e58b2d5af50615ef83d0681f0d3dfb08ad752a",
+    "smoldoc_en_ln.jsonl": "31013dbb4d6671f4aff7b57185544f571f4d67ab024eeb15816c509c337cb67a",
+    "smoldoc_en_kg.jsonl": "989e03f1018dace5e91eddd9256462e38a64186943ec327ce9a79c1fdca7635b",
+    "smol_dev.jsonl": "005ea7e40845da9e94934c5b8cb50a52d9bd93c6427b06fca36ad130f0377caa",
+    "smol_test.jsonl": "778e221fe9d729cfaa0ca67cf1066ac251f40e13deb79a69798b710aba7e1221",
+    "flores200_dev.jsonl": "666b446825641351455b08fc1e2966e1ab89a62fe31898ee939f4f40849d3fdf",
+    "flores200_devtest.jsonl": "e7910816b91766a13f64c91827235e571eba060f1104cee853016007443edb42"
+  },
+  "output_sha256": "526ff9a571afec9c6331c2b1da81093e822cbf24333d4ce6509f0ab6f32f8207",
+  "limitations": [
+    "User approved all pairs in the archived 3053-pair dataset; newly eligible pairs are not covered by that review.",
+    "No systematic domain classification performed.",
+    "Semantic near-duplicates are not detected.",
+    "Rebuild this dataset if target evaluation splits change."
+  ]
+}
