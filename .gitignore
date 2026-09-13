@@ -1,6 +1,4 @@
-data/raw/
-data/interim/
-data/processed/
+
 # Kunzika 2008 is in copyright; the extracted proverbs stay local.
 data/proverbs/*
 !data/proverbs/README.md

@@ -1,0 +1,34 @@
+{
+  "splitting": "documents and duplicate-linked groups stay together",
+  "seed": 13,
+  "counts": {
+    "train": 2011,
+    "dev": 153,
+    "test": 302
+  },
+  "overlap": {
+    "train/dev": {
+      "document_id": 0,
+      "group_id": 0,
+      "src": 0,
+      "trg": 0
+    },
+    "train/test": {
+      "document_id": 0,
+      "group_id": 0,
+      "src": 0,
+      "trg": 0
+    },
+    "dev/test": {
+      "document_id": 0,
+      "group_id": 0,
+      "src": 0,
+      "trg": 0
+    }
+  },
+  "sha256": {
+    "train": "166fb76b46019f8e17aa98f1df36246d9c75e6610244bf2bf13fde11d22bfe39",
+    "dev": "005ea7e40845da9e94934c5b8cb50a52d9bd93c6427b06fca36ad130f0377caa",
+    "test": "778e221fe9d729cfaa0ca67cf1066ac251f40e13deb79a69798b710aba7e1221"
+  }
+}
