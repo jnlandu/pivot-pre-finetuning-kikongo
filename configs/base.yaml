@@ -1,0 +1,17 @@
+# Shared defaults. Experiment configs are full standalone files (see
+# configs/experiments/); this one documents the knobs and their rationale.
+name: base
+base_model: google/mt5-base   # mT5 has never seen Kikongo -- that is the point
+pivot: null                   # null = no pivot pre-finetuning (the control)
+pivot_size: 50000
+pivot_epochs: 1.0
+pivot_lr: 5.0e-4
+target_epochs: 20.0           # ~1.6k gold pairs needs many passes
+target_lr: 3.0e-4
+use_lexicon: false            # add the 4k GATITOS entries to stage B
+batch_size: 16
+grad_accum: 2
+max_source_len: 128
+max_target_len: 128
+bf16: true                    # never fp16: mT5 overflows
+seed: 13

@@ -1,0 +1,15 @@
+name: sag_100k
+base_model: google/mt5-base
+pivot: sag
+pivot_size: 100000
+pivot_epochs: 1.0
+pivot_lr: 0.0005
+target_epochs: 20.0
+target_lr: 0.0003
+use_lexicon: false
+batch_size: 16
+grad_accum: 2
+max_source_len: 128
+max_target_len: 128
+bf16: true
+seed: 13
